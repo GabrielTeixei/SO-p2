@@ -156,7 +156,7 @@ static void processOrder ()
 
     /* insert your code here */
 
-    sh->state = COOKING;
+    sh->state = COOK;
     saveState(nFic, sh);
 
     if (semUp (semgid, sh->mutex) == -1) {                                                      /* exit critical region */

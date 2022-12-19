@@ -152,7 +152,7 @@ static int waitForClientOrChef()
     }
     
     /* insert your code here */
-    sh -> waiterState = WAITING_FOR_REQUEST; //altera o estado do waiter
+    sh -> waiterState = WAIT_FOR_REQUEST; //altera o estado do waiter
     saveState(nFic, sh);//guarda o estado do waiter
     
 
@@ -172,13 +172,13 @@ static int waitForClientOrChef()
     } 
 
     /* insert your code here */
-    if(sh->clientState == WAITING_FOR_FOOD){ //verifica se o pedido é do cliente
+    if(sh->clientState == WAIT_FOR_FOOD){ //verifica se o pedido é do cliente
         ret = FOODREQ;
     }
-    else if(sh->clientState == WAITING_FOR_BILL){//verifica se o pedido é do cliente
+    else if(sh->clientState == WAIT_FOR_BILL){//verifica se o pedido é do cliente
         ret = BILL;
     }
-    else if(sh->chefState == FOOD_READY){//verifica se o pedido é do chef
+    else if(sh->chefState == FINISHED){//verifica se o pedido é do chef
         ret = FOODREADY;
     }
     saveState(nFic, sh);//guarda o estado
@@ -208,7 +208,7 @@ static void informChef ()
     }
 
     /* insert your code here */
-    sh -> waiterState = TAKING_ORDER_TO_CHEF; //altera o estado do waiter
+    sh -> waiterState = WAIT_FOR_ORDER; //altera o estado do waiter
     saveState(nFic, sh);//guarda o estado do waiter
 
 
@@ -238,7 +238,7 @@ static void takeFoodToTable ()
     }
 
     /* insert your code here */
-    sh -> waiterState = BRINGING_ORDER_TO_TABLE; //altera o estado do waiter
+    sh -> waiterState = TAKE_TO_TABLE; //altera o estado do waiter
     saveState(nFic, sh);//guarda o estado do waiter
     
     if (semUp (semgid, sh->mutex) == -1)  {                                                  /* exit critical region */
@@ -264,7 +264,7 @@ static void receivePayment ()
     }
 
     /* insert your code here */
-    sh -> waiterState = TAKING_PAYMENT; //altera o estado do waiter
+    sh -> waiterState = RECEIVE_PAYMENT; //altera o estado do waiter
     saveState(nFic, sh);//guarda o estado do waiter
 
     if (semUp (semgid, sh->mutex) == -1)  {                                                  /* exit critical region */
