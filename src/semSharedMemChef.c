@@ -127,7 +127,7 @@ static void waitForOrder ()
     /* insert your code here */
 
     while(!order){
-        if(sh->state == WAITING_FOR_ORDER){
+        if(sh->state ==WAITORDER){
             order = true;
         }
     }
@@ -166,7 +166,7 @@ static void processOrder ()
 
     /* insert your code here */
 
-    sh->state = DELIVERING_FOOD;
+    sh->state = ALLFINISHED;
 
 }
 

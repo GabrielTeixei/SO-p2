@@ -159,7 +159,7 @@ static void eat (int id)
  */
 static bool waitFriends(int id)
 {
-    bool first = false;
+    bool first = true;  
 
     if (semDown (semgid, sh->mutex) == -1) {                                                  /* enter critical region */
         perror ("error on the down operation for semaphore access (CT)");
@@ -167,17 +167,46 @@ static bool waitFriends(int id)
     }
 
     /* insert your code here */
-    sh -> fst.st.clientID[id] = WAIT_FOR_FRIENDS;//atualiza o estado do cliente
+    first = sh->fst.st.clientID[id] == WAIT_FOR_FRIENDS;//verifica se o cliente é o primeiro
+
+    if (first) sh->fst.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
     saveState(nFic, &sh->fst);//guarda o estado do cliente
+
+    if (first) sh->fst.st.first = id;//guarda o id do primeiro cliente
+    saveState(nFic, &sh->fst);//guarda o estado do cliente
+
+    if (first) sh->fst.st.last = id;//guarda o id do ultimo cliente
+    saveState(nFic, &sh->fst);//guarda o estado do cliente
+    if (first)
+    {
+        sh->fst.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
+        saveState(nFic, &sh->fst);//guarda o estado do cliente
+        semUp(semgid, sh->tableComplete[id]);//informa o ultimo cliente que a mesa esta completa
+    }
+    else
+    {
+        sh->fst.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
+        saveState(nFic, &sh->fst);//guarda o estado do cliente
+        sh->fst.st.last = id;//guarda o id do ultimo cliente
+        saveState(nFic, &sh->fst);//guarda o estado do cliente
+    }
+    sh->fst.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
+    saveState(nFic, &sh->fst);//guarda o estado do cliente
+
+
+
+
+    // sh -> fst.st.clientID[id] = WAIT_FOR_FRIENDS;//atualiza o estado do cliente
+    // saveState(nFic, &sh->fst);//guarda o estado do cliente
      
 
-    if (semUp (semgid, sh->mutex) == -1)                                                      /* exit critical region */
-    { perror ("error on the up operation for semaphore access (CT)");
-        exit (EXIT_FAILURE);
-    }
+    // if (semUp (semgid, sh->mutex) == -1)                                                      /* exit critical region */
+    // { perror ("error on the up operation for semaphore access (CT)");
+    //     exit (EXIT_FAILURE);
+    // }
 
-    /* insert your code here */
-    semDown(semgid, sh->tableComplete[id]);//espera que o ultimo cliente diga que a mesa esta completa
+    // /* insert your code here */
+    // semDown(semgid, sh->tableComplete[id]);//espera que o ultimo cliente diga que a mesa esta completa
     
     return first;
 }

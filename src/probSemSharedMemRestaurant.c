@@ -90,20 +90,20 @@ int main (int argc, char *argv[])
     srandom ((unsigned int) getpid ());                                
 
     /* initialize problem internal status */
-    sh->fSt.st.chefStat   = WAIT_FOR_ORDER;                     /* the chef waits for an order */
-    sh->fSt.st.waiterStat = WAIT_FOR_REQUEST;                /* the waiter waits for a request */
+    sh->fst.st.chefStat   = WAIT_FOR_ORDER;                     /* the chef waits for an order */
+    sh->fst.st.waiterStat = WAIT_FOR_REQUEST;                /* the waiter waits for a request */
     for (c = 0; c < TABLESIZE; c++) {
-        sh->fSt.st.clientStat[c] = INIT;                            /* clients are initialized */
+        sh->fst.st.clientStat[c] = INIT;                            /* clients are initialized */
     }
-    sh->fSt.tableClients = 0;
-    sh->fSt.tableFinishEat = 0;
+    sh->fst.tableClients = 0;
+    sh->fst.tableFinishEat = 0;
 
-    sh->fSt.foodRequest = 0;
-    sh->fSt.foodOrder = 0;
-    sh->fSt.foodReady = 0;
-    sh->fSt.paymentRequest = 0;
+    sh->fst.foodRequest = 0;
+    sh->fst.foodOrder = 0;
+    sh->fst.foodReady = 0;
+    sh->fst.paymentRequest = 0;
 
-    sh->fSt.tableLast = -1;
+    sh->fst.tableLast = -1;
 
     /* create log file */
     createLog (nFic);                                  

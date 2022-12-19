@@ -25,7 +25,7 @@
  */
 typedef struct
         { /** \brief full state of the problem */
-          FULL_STAT fSt;
+          FULL_STAT fst;
 
           /* semaphores ids */
           /** \brief identification of critical region protection semaphore – val = 1 */
