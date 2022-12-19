@@ -230,7 +230,7 @@ static void orderFood (int id)
     }
 
     /* insert your code here */
-    sh -> fst.st.clientID[id] = ORDER_FOOD;//atualiza o estado do cliente
+    sh -> fst.st.clientID[id] = WAIT_FOR_ORDER;//atualiza o estado do cliente
     saveState(nFic, &sh->fst);//guarda o estado do cliente
 
     
@@ -286,7 +286,7 @@ static void waitFood (int id)
 
     /* insert your code here */
 
-    sh -> fst.st.clientID[id] = EATING;//atualiza o estado do cliente
+    sh -> fst.st.clientID[id] = EAT;//atualiza o estado do cliente
     saveState(nFic, &sh->fst);//guarda o estado do cliente
 
 
