@@ -38,6 +38,7 @@ typedef struct {
 typedef struct
 {   /** \brief state of all intervening entities */
     STAT st;
+    
 
     /** \brief number of clients at table */
     int tableClients;
