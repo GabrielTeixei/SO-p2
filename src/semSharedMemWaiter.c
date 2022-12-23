@@ -144,7 +144,6 @@ int main (int argc, char *argv[])
 
 static int waitForClientOrChef()
 {   
-
     int ret=0; 
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
         perror ("error on the up operation for semaphore access (WT)");
@@ -165,7 +164,6 @@ static int waitForClientOrChef()
 
     semDown (semgid, sh->waiterReq);//espera que o cliente ou o chef façam um pedido
 
-
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
         perror ("error on the up operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
@@ -183,14 +181,12 @@ static int waitForClientOrChef()
     }
     saveState(nFic, sh);//guarda o estado
 
-
     if (semUp (semgid, sh->mutex) == -1) {                                                  /* exit critical region */
      perror ("error on the down operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
 
     return ret;
-
 }
 
 /**
