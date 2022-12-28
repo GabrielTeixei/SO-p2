@@ -168,21 +168,21 @@ static bool waitFriends(int id)
     
      /* insert your code here */
 
-    if (sh->fSt.st.clientID[id] == WAIT_FOR_FRIENDS)
+    if (sh->fSt.st.clientStat[id] == WAIT_FOR_FRIENDS)
     {
-        sh->fSt.st.clientID[id] = WAIT_FOR_OTHERS;
+        sh->fSt.st.clientStat[id] = WAIT_FOR_OTHERS;
         saveState(nFic, &sh->fSt);
-        sh->fSt.st.first = id;
+        //sh->fSt.st.first = id;
         saveState(nFic, &sh->fSt);
-        sh->fSt.st.last = id;
+        //sh->fSt.st.last = id;
         saveState(nFic, &sh->fSt);
         first = true;
     }
     else
     {
-        sh->fSt.st.clientID[id] = WAIT_FOR_OTHERS;
+        sh->fSt.st.clientStat[id] = WAIT_FOR_OTHERS;
         saveState(nFic, &sh->fSt);
-        sh->fSt.st.last = id;
+        //sh->fSt.st.last = id;
         saveState(nFic, &sh->fSt);
     }
 
@@ -192,71 +192,16 @@ static bool waitFriends(int id)
     }
     // /* insert your code here */
     
-    sh -> fSt.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
+    sh -> fSt.st.clientStat[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
-    sh -> fSt.st.first = id;  //guarda o id do primeiro cliente
+   // //sh -> fSt.st.first = id;  //guarda o id do primeiro cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
-    sh -> fSt.st.last = id;   //guarda o id do ultimo cliente
+    //sh -> fSt.st.last = id;   //guarda o id do ultimo cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
     first = true;             //cliente é o primeiro
 
     return first;
-//-------------------------------------------------------------------------------------------------
 
-
-/* insert your code here */
-/*
-   
-
-    //após a primeira iteração, o cliente fica a espera dos outros clientes
-
-    first = sh->fSt.st.clientID[id] == WAIT_FOR_FRIENDS;//verifica se o cliente é o primeiro
-
-    if (first) sh->fSt.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
-    saveState(nFic, &sh->fSt);//guarda o estado do cliente
-
-    if (first) sh->fSt.st.first = id;//guarda o id do primeiro cliente
-    saveState(nFic, &sh->fSt);//guarda o estado do cliente
-
-    if (first) sh->fSt.st.last = id;//guarda o id do ultimo cliente
-    saveState(nFic, &sh->fSt);//guarda o estado do cliente
-    if (first)
-    {
-        sh->fSt.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
-        saveState(nFic, &sh->fSt);//guarda o estado do cliente
-        semUp(semgid, sh->tableComplete[id]);//informa o ultimo cliente que a mesa esta completa
-    }
-    else
-    {
-        sh->fSt.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
-        saveState(nFic, &sh->fSt);//guarda o estado do cliente
-        sh->fSt.st.last = id;//guarda o id do ultimo cliente
-        saveState(nFic, &sh->fSt);//guarda o estado do cliente
-    }
-    sh->fSt.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
-    saveState(nFic, &sh->fSt);//guarda o estado do cliente
-    
-    sh -> fSt.st.clientID[id] = WAIT_FOR_FRIENDS;//atualiza o estado do cliente
-    saveState(nFic, &sh->fSt);//guarda o estado do cliente
-     
-
-    // if (semUp (semgid, sh->mutex) == -1)                                                      /* exit critical region */
-    // { perror ("error on the up operation for semaphore access (CT)");
-    //     exit (EXIT_FAILURE);
-    // }
-
-
-    // /* insert your code here */
-
-    // if (first) sh->fSt.st.first = id;//guarda o id do primeiro cliente
-    // saveState(nFic, &sh->fSt);//guarda o estado do cliente
-
-    // if (first) sh->fSt.st.last = id;//guarda o id do ultimo cliente
-    // saveState(nFic, &sh->fSt);//guarda o estado do cliente
-
-    // if (first) semUp(semgid, sh->tableComplete[id]);//informa o ultimo cliente que a mesa esta completa*/
-
-    //-------------------------------------------------------------------------------------------------
 }
 
 /**
@@ -278,7 +223,7 @@ static void orderFood (int id)
     }
 
     /* insert your code here */
-    sh -> fSt.st.clientID[id] = WAIT_FOR_ORDER;//atualiza o estado do cliente
+    sh -> fSt.st.clientStat[id] = WAIT_FOR_ORDER;//atualiza o estado do cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
 
     
@@ -288,8 +233,14 @@ static void orderFood (int id)
     }
 
     /* insert your code here */
+    //semDown(semgid, sh->orderReceived[id]);//espera pelo pedido ser recebido pelo waiter
     
-    semDown(semgid, sh->orderFood[id]);//espera que o garçom receba o pedido
+    /// aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+    sh -> fSt.st.clientStat[id] = WAIT_FOR_ORDER;//atualiza o estado do cliente
+    saveState(nFic, &sh->fSt);//guarda o estado do cliente
+    
+    
+    
 
 }
 
@@ -312,7 +263,7 @@ static void waitFood (int id)
 
     /* insert your code here */
 
-    sh -> fSt.st.clientID[id] = WAIT_FOR_FOOD;//atualiza o estado do cliente
+    sh -> fSt.st.clientStat[id] = WAIT_FOR_FOOD;//atualiza o estado do cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
 
 
@@ -323,7 +274,11 @@ static void waitFood (int id)
 
     /* insert your code here */
 
-    semDown(semgid, sh->food[id]);//espera que o ultimo cliente diga que a mesa esta completa
+    //semDown(semgid, sh->food[id]);//espera que o ultimo cliente diga que a mesa esta completa
+
+    /// aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+    sh -> fSt.st.clientStat[id] = EAT;//atualiza o estado do cliente
+    saveState(nFic, &sh->fSt);//guarda o estado do cliente
 
 
     if (semDown (semgid, sh->mutex) == -1) {                                                  /* enter critical region */
@@ -333,7 +288,7 @@ static void waitFood (int id)
 
     /* insert your code here */
 
-    sh -> fSt.st.clientID[id] = EAT;//atualiza o estado do cliente
+    sh -> fSt.st.clientStat[id] = EAT;//atualiza o estado do cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
 
 
@@ -364,7 +319,7 @@ static void waitAndPay (int id)
 
     /* insert your code here */
 
-    sh -> fSt.st.clientID[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
+    sh -> fSt.st.clientStat[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente  
 
     if (semUp (semgid, sh->mutex) == -1) {                                                      /* enter critical region */
@@ -372,6 +327,7 @@ static void waitAndPay (int id)
         exit (EXIT_FAILURE);
     }
     /* insert your code here */
+
 
     semDown(semgid, sh->end[id]);//espera que o ultimo cliente diga que a mesa esta completa
 
@@ -382,7 +338,7 @@ static void waitAndPay (int id)
         }
         /* insert your code here */
 
-        sh -> fSt.st.clientID[id] = WAIT_FOR_BILL;//atualiza o estado do cliente
+        sh -> fSt.st.clientStat[id] = WAIT_FOR_BILL;//atualiza o estado do cliente
         saveState(nFic, &sh->fSt);//guarda o estado do cliente
 
         if (semUp (semgid, sh->mutex) == -1) {                                                    /* enter critical region */
@@ -390,8 +346,7 @@ static void waitAndPay (int id)
             exit (EXIT_FAILURE);
         }
         /* insert your code here */
-
-        semDown(semgid, sh->pay[id]);//espera que o ultimo cliente diga que a mesa esta completa
+        semDown(semgid,sh->paymentReques[id]);//espera que o ultimo cliente diga que a mesa esta completa
     }
 
     if (semDown (semgid, sh->mutex) == -1) {                                                  /* enter critical region */
@@ -401,7 +356,7 @@ static void waitAndPay (int id)
 
     /* insert your code here */
 
-    sh -> fSt.st.clientID[id] = FINISHED;//atualiza o estado do cliente
+    sh -> fSt.st.clientStat[id] = FINISHED;//atualiza o estado do cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
 
     if (semUp (semgid, sh->mutex) == -1) {                                                  /* enter critical region */

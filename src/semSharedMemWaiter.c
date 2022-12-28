@@ -204,7 +204,7 @@ static void informChef ()
     }
 
     /* insert your code here */
-    sh -> waiterState = WAIT_FOR_ORDER; //altera o estado do waiter
+    sh -> waiterStat = WAIT_FOR_ORDER; //altera o estado do waiter
     saveState(nFic, sh);//guarda o estado do waiter
 
 
@@ -234,7 +234,7 @@ static void takeFoodToTable ()
     }
 
     /* insert your code here */
-    sh -> waiterState = TAKE_TO_TABLE; //altera o estado do waiter
+    sh -> waiterStat = TAKE_TO_TABLE; //altera o estado do waiter
     saveState(nFic, sh);//guarda o estado do waiter
     
     if (semUp (semgid, sh->mutex) == -1)  {                                                  /* exit critical region */
