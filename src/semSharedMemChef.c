@@ -125,13 +125,14 @@ static void waitForOrder ()
     }
 
     /* insert your code here */
-
+    
     while(!order){
-        if(sh->state ==WAITORDER){
+        if(sh->fSt.st.chefStat == WAITORDER){
             order = true;
         }
     }
-
+    
+    
     if (semUp (semgid, sh->mutex) == -1) {                                                      /* exit critical region */
         perror ("error on the up operation for semaphore access (PT)");
         exit (EXIT_FAILURE);
@@ -153,10 +154,10 @@ static void processOrder ()
         exit (EXIT_FAILURE);
     }
 
-    /* insert your code here */
+     /* insert your code here */
 
-    sh->state = COOK;
-    saveState(nFic, sh);
+    sh->fSt.st.chefStat = COOK;
+    saveState(nFic, &sh->fSt);
 
     if (semUp (semgid, sh->mutex) == -1) {                                                      /* exit critical region */
         perror ("error on the up operation for semaphore access (PT)");
@@ -165,7 +166,10 @@ static void processOrder ()
 
     /* insert your code here */
 
-    sh->state = ALLFINISHED;
+    //sh->fSt.st.chefStat = ALLFINISHED; 
+    sh->fSt.st.chefStat = REST; 
+    
+    //##############não devia ser sh->state = REST ??????????????
 
 }
 

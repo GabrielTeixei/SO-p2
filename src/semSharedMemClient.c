@@ -329,7 +329,7 @@ static void waitAndPay (int id)
     /* insert your code here */
 
 
-    semDown(semgid, sh->end[id]);//espera que o ultimo cliente diga que a mesa esta completa
+    //semDown(semgid, sh->end[id]);//espera que o ultimo cliente diga que a mesa esta completa
 
     if(last) { 
         if (semDown (semgid, sh->mutex) == -1) {                                                  /* enter critical region */
