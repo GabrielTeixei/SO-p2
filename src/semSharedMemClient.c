@@ -238,9 +238,6 @@ static void orderFood (int id)
     /// aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
     sh -> fSt.st.clientStat[id] = WAIT_FOR_ORDER;//atualiza o estado do cliente
     saveState(nFic, &sh->fSt);//guarda o estado do cliente
-    
-    
-    
 
 }
 
@@ -278,7 +275,7 @@ static void waitFood (int id)
 
     /// aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
     sh -> fSt.st.clientStat[id] = EAT;//atualiza o estado do cliente
-    saveState(nFic, &sh->fSt);//guarda o estado do cliente
+    //saveState(nFic, &sh->fSt);//guarda o estado do cliente
 
 
     if (semDown (semgid, sh->mutex) == -1) {                                                  /* enter critical region */
@@ -327,6 +324,7 @@ static void waitAndPay (int id)
         exit (EXIT_FAILURE);
     }
     /* insert your code here */
+    sh->fSt.st.clientStat[id] = WAIT_FOR_OTHERS;//atualiza o estado do cliente
 
 
     //semDown(semgid, sh->end[id]);//espera que o ultimo cliente diga que a mesa esta completa
@@ -346,7 +344,9 @@ static void waitAndPay (int id)
             exit (EXIT_FAILURE);
         }
         /* insert your code here */
-        semDown(semgid,sh->paymentReques[id]);//espera que o ultimo cliente diga que a mesa esta completa
+        sh-> fSt.st.clientStat[id] = WAIT_FOR_BILL;//atualiza o estado do cliente
+        saveState(nFic, &sh->fSt);//guarda o estado do cliente
+        //semDown(semgid,sh->paymentReques[id]);//espera que o ultimo cliente diga que a mesa esta completa
     }
 
     if (semDown (semgid, sh->mutex) == -1) {                                                  /* enter critical region */

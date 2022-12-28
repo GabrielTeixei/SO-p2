@@ -205,8 +205,8 @@ static void informChef ()
     }
 
     /* insert your code here */
-    sh -> waiterState = WAIT_FOR_ORDER; //altera o estado do waiter
-    saveState(nFic, sh);//guarda o estado do waiter
+    sh -> fSt.st.waiterStat = WAIT_FOR_ORDER; //altera o estado do waiter
+    saveState(nFic, &sh->fSt);//guarda o estado do waiter
 
 
     if (semUp (semgid, sh->mutex) == -1)                                                   /* exit critical region */
@@ -215,9 +215,8 @@ static void informChef ()
     }
 
      /* insert your code here */
-    //semUp(semgid, sh->chefReq);//envia um pedido ao chef
-    semUp(semgid, sh->waitOrder);//envia um pedido ao chef
-
+   
+    semUp (semgid, sh->waiterRequest);//informa o chef que o pedido está pronto
 
 	///// não temos de por o INFORM_CHEF
 
@@ -238,8 +237,8 @@ static void takeFoodToTable ()
     }
 
     /* insert your code here */
-    sh -> waiterState = TAKE_TO_TABLE; //altera o estado do waiter
-    saveState(nFic, sh);//guarda o estado do waiter
+    sh -> fSt.st.waiterStat = TAKE_TO_TABLE; //altera o estado do waiter
+    saveState(nFic, &sh->fSt);//guarda o estado do waiter
     
     if (semUp (semgid, sh->mutex) == -1)  {                                                  /* exit critical region */
      perror ("error on the down operation for semaphore access (WT)");
