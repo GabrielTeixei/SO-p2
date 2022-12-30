@@ -140,19 +140,23 @@ int main (int argc, char *argv[])
  *  The internal state should be saved.
  *
  *  \return type of request (FOODREQ, FOODREADY, PAYREQ)
+ não percebi os ultimos
+ 
  */
 
-static int waitForClientOrChef()
+static int waitForClientOrChef() 
 {   
+
     int ret=0; 
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
         perror ("error on the up operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
     
-      /* insert your code here */
-    sh -> fSt.st.waiterStat = WAIT_FOR_REQUEST; //altera o estado do waiter
-    saveState(nFic, &sh->fSt);//guarda o estado do waiter
+    /* insert your code here */
+    //ATUALIZA O ESATDO PATA WAIT_FOR_REQUEST E GUARDA
+    sh -> fSt.st.waiterStat = WAIT_FOR_REQUEST; 
+    saveState(nFic, &sh->fSt);		
     
 
     if (semUp (semgid, sh->mutex) == -1)      {                                             /* exit critical region */
@@ -161,8 +165,16 @@ static int waitForClientOrChef()
     }
     
     /* insert your code here */
-
-    semDown (semgid, sh->waiterRequest);//espera que o cliente ou o chef façam um pedido
+    
+    //AVISA O CHEF OU OS CLIENTES QUE RECEBEU O PEDIDO
+    if (semUp(semgid, sh->waiterRequest) == -1)      {      
+        perror ("error on the down operation to !!WAIT FOR REQUESTS!!");
+        exit (EXIT_FAILURE);
+    }
+    if (semUp(semgid, sh->requestReceived) == -1){
+        	perror ("error on the down operation for !!REQUESTRECEIVED!!");
+      		exit (EXIT_FAILURE);	
+    }
 
 
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
@@ -170,17 +182,30 @@ static int waitForClientOrChef()
         exit (EXIT_FAILURE);
     } 
 
-     /* insert your code here */
-    if(*sh-> fSt.st.clientStat == WAIT_FOR_FOOD){ //verifica se o pedido é do cliente
+    /* insert your code here */
+    //usar as flags para fazer estes ifs!!!!!!!!!!!!!!
+    if(sh-> fSt.foodRequest >0){ //verifica se o pedido é do cliente 
+    	/**if (semUp(semgid, sh->requestReceived) == -1){
+        	perror ("error on the down operation for !!REQUESTRECEIVED!!");
+      		exit (EXIT_FAILURE);	
+    	}**/
+    	sh->fSt.foodOrder++;
         ret = FOODREQ;
     }
-    else if(*sh-> fSt.st.clientStat == WAIT_FOR_BILL){//verifica se o pedido é do cliente
+    else if(sh-> fSt.paymentRequest > 0 ){//verifica se o cliente pede a conta
+    	/*if (semUp(semgid, sh->requestReceived) == -1){
+        	perror ("error on the down operation for !!REQUESTRECEIVED!!");
+      		exit (EXIT_FAILURE);	
+    	}*/
+    	sh->fSt.paymentRequest--;
         ret = BILL;
     }
-    else if(sh-> fSt.st.chefStat == FINISHED){//verifica se o pedido é do chef
+    else if(sh-> fSt.foodReady > 0 ){//verifica se o chef já acabou 
+    	sh->fSt.foodReady--;
         ret = FOODREADY;
     }
     saveState(nFic, &sh->fSt);//guarda o estado
+
 
     if (semUp (semgid, sh->mutex) == -1) {                                                  /* exit critical region */
      perror ("error on the down operation for semaphore access (WT)");
@@ -188,6 +213,7 @@ static int waitForClientOrChef()
     }
 
     return ret;
+
 }
 
 /**
@@ -205,21 +231,23 @@ static void informChef ()
     }
 
     /* insert your code here */
-    sh -> fSt.st.waiterStat = WAIT_FOR_ORDER; //altera o estado do waiter
-    saveState(nFic, &sh->fSt);//guarda o estado do waiter
-
+    //ATUALIZA ESTADO PARA INFORM_CHEF
+    //sh -> fSt.foodOrder++;                    pus lá atrás
+    sh -> fSt.st.waiterStat = INFORM_CHEF;
+    saveState(nFic, &sh->fSt);
+	
 
     if (semUp (semgid, sh->mutex) == -1)                                                   /* exit critical region */
     { perror ("error on the down operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
 
-     /* insert your code here */
-   
-    semUp (semgid, sh->waiterRequest);//informa o chef que o pedido está pronto
-
-	///// não temos de por o INFORM_CHEF
-
+    /* insert your code here */
+    //LEVA O PEDIDO AO CHEFE, informa chefe pelo semáforo 
+    if (semDown (semgid, sh->mutex) == -1)  {
+        perror ("error on the up operation for !!WAITORDER!!");
+        exit (EXIT_FAILURE);
+    }
 }
 
 /**
@@ -237,13 +265,25 @@ static void takeFoodToTable ()
     }
 
     /* insert your code here */
-    sh -> fSt.st.waiterStat = TAKE_TO_TABLE; //altera o estado do waiter
-    saveState(nFic, &sh->fSt);//guarda o estado do waiter
+    //atualiza o esatdo para TAKE_TO_TABLE
+    if(sh->fSt.foodRequest > 0){
+    	sh -> fSt.foodRequest--;
+        sh -> fSt.st.waiterStat = TAKE_TO_TABLE;
+        saveState(nFic, &sh->fSt);
+         
+        
+        //avisa que a comida chegou á mesa e podem comer
+        if (semUp(semgid, sh-> foodArrived) == -1) {
+             perror("error on the up operation for semaphore access (GL)");
+             exit(EXIT_FAILURE);
+        }
+    }
     
     if (semUp (semgid, sh->mutex) == -1)  {                                                  /* exit critical region */
      perror ("error on the down operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
+
     
 }
 
@@ -262,12 +302,21 @@ static void receivePayment ()
     }
 
     /* insert your code here */
-    sh -> fSt.st.waiterStat = RECEIVE_PAYMENT; //altera o estado do waiter
-    saveState(nFic, &sh->fSt);//guarda o estado do waiter
+    //ATUALIZA O ESTADO PARA RECEIVE_PAYMENT
+    if(sh->fSt.paymentRequest > 0){
+    	sh -> fSt.paymentRequest--;
+    	sh -> fSt.st.waiterStat = RECEIVE_PAYMENT; 
+    	saveState(nFic, &sh->fSt);
+        
+        //avisa que a comida chegou á mesa e podem comer
+        if (semUp(semgid, sh-> requestReceived) == -1) {
+             perror("error on the up operation for semaphore access (GL)");
+             exit(EXIT_FAILURE);
+        }
+    }
 
     if (semUp (semgid, sh->mutex) == -1)  {                                                  /* exit critical region */
      perror ("error on the down operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
 }
-
