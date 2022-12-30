@@ -44,7 +44,10 @@ static int semgid;
 /** \brief pointer to shared memory region */
 static SHARED_DATA *sh;
 
+/*\brief chefs wait for a food order.*/
 static void waitForOrder ();
+
+/*\brief chef cooks, then delivers the food to the waiter and then rests */
 static void processOrder ();
 
 /**
@@ -116,23 +119,25 @@ int main (int argc, char *argv[])
 static void waitForOrder ()
 {
     /* insert your code here */
-
-    bool order = false;
+    
+    //USAR SEMÁFORO--------------------------WaitOrder()
+    if (semDown (semgid, sh-> waitOrder) == -1) { 
+        perror ("error on the down operation of !!!sempahore waitOrder!!!");
+        exit (EXIT_FAILURE);
+    }
 
     if (semDown (semgid, sh->mutex) == -1) {                                                      /* enter critical region */
         perror ("error on the up operation for semaphore access (PT)");
         exit (EXIT_FAILURE);
     }
 
-    /* insert your code here */
+    /* insert your code here */ ////NÃO SEI O QUE POR AQUI NA REALIDADE
     
-    while(!order){
-        if(sh->fSt.st.chefStat == WAITORDER){
-            order = true;
-        }
-    }
-    
-    
+    //atualizar estado para WAIT_FOR_ORDER
+    //sh->fSt.st.chefStat == WAIT_FOR_ORDER;
+    saveState(nFic, &sh->fSt);    
+
+
     if (semUp (semgid, sh->mutex) == -1) {                                                      /* exit critical region */
         perror ("error on the up operation for semaphore access (PT)");
         exit (EXIT_FAILURE);
@@ -154,10 +159,16 @@ static void processOrder ()
         exit (EXIT_FAILURE);
     }
 
-     /* insert your code here */
-
-    sh->fSt.st.chefStat = COOK;
-    saveState(nFic, &sh->fSt);
+    /* insert your code here */
+    
+    //atualizar estado para COOK
+    //if(sh->fSt.foodOrder > 0){
+        sh->fSt.st.chefStat = COOK;
+    	saveState(nFic, &sh->fSt);
+    	
+    	sh->fSt.foodReady++;
+    	sh->fSt.foodOrder--;
+    //}
 
     if (semUp (semgid, sh->mutex) == -1) {                                                      /* exit critical region */
         perror ("error on the up operation for semaphore access (PT)");
@@ -166,10 +177,16 @@ static void processOrder ()
 
     /* insert your code here */
 
-    //sh->fSt.st.chefStat = ALLFINISHED; 
-    sh->fSt.st.chefStat = REST; 
-    
-    //##############não devia ser sh->state = REST ??????????????
+    //atualizar o estado para REST
+    if(sh->fSt.foodReady > 0){
+    	if (semDown (semgid, sh->waiterRequest) == -1){
+            perror ("error on the up operation !!WAITERREQUEST!! ");
+            exit (EXIT_FAILURE);
+    	}
+    	
+        sh->fSt.st.chefStat = REST;
+    	saveState(nFic, &sh->fSt);
+    }
 
 }
 
