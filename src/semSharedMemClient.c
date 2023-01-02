@@ -190,7 +190,7 @@ static bool waitFriends(int id)
         }
     	
     	if(sh->fSt.tableClients == 1){
-    	     sh->fSt.st.clientStat[id] = WAIT_FOR_OTHERS;
+    	     sh->fSt.st.clientStat[id] = WAIT_FOR_FRIENDS;
              saveState(nFic, &sh->fSt);
              
     	     sh->fSt.tableFirst = id;
@@ -203,7 +203,7 @@ static bool waitFriends(int id)
              first = false;
              
     	}else{
-    	     sh->fSt.st.clientStat[id] = WAIT_FOR_OTHERS;
+    	     sh->fSt.st.clientStat[id] = WAIT_FOR_FRIENDS;
              saveState(nFic, &sh->fSt);
     	}
     }
@@ -417,7 +417,7 @@ static void waitAndPay (int id)
 
         /* insert your code here */
         //AVISA O CHEF OU OS CLIENTES QUE RECEBEU O PEDIDO
-    	if (semDown(semgid, sh->waiterRequest) == -1)      {      
+    	if (semUp(semgid, sh->waiterRequest) == -1)      {      
         	perror ("error on the down operation to !!WAIT FOR REQUESTS!!");
        		exit (EXIT_FAILURE);
     	}
